@@ -1,6 +1,7 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, FileExtensionValidator, MaxValueValidator
 from django.contrib.postgres.fields import ArrayField
+from django.conf import settings
 
 
 class Station(models.Model):
@@ -12,12 +13,12 @@ class Station(models.Model):
 
     name = models.CharField(max_length=100)
     short_text = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='stations/logos')
-    rating = models.FloatField(default=0.0, blank=True)
+    logo = models.ImageField(upload_to='stations/logos/%Y/%m/%d/', blank=True, null=True)
+    rating = models.FloatField(default=0.0)
     address = models.CharField(max_length=150)
-    latitude = models.PositiveIntegerField()
-    longitude = models.PositiveIntegerField()
-    video = models.FileField(upload_to='stations/videos', blank=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    video = models.FileField(upload_to='stations/videos/%Y/%m/%d/', blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4', 'mkv', 'webm', 'mpeg'])])
     comforts = ArrayField(base_field=models.PositiveSmallIntegerField(choices=Comforts.choices, blank=True, null=True))
 
     def __str__(self):
@@ -26,7 +27,7 @@ class Station(models.Model):
 
 class StationImage(models.Model):
     station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='stations/images')
+    image = models.ImageField(upload_to='stations/images/%Y/%m/%d/')
     order = models.PositiveSmallIntegerField(default=1, validators=[MinValueValidator(1)])
 
     class Meta():
@@ -43,11 +44,16 @@ class StationWorkTime(models.Model):
         SATURDAY = 6, 'Суббота'
         SUNDAY = 7, 'Воскресенье'
 
-    week_days = models.PositiveSmallIntegerField(choices=WeekDays.choices, default=1)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='work_times')
+
     station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='work_times')
     week_day = models.PositiveSmallIntegerField(choices=WeekDays.choices)
+
     start_time = models.TimeField()
     end_time = models.TimeField()
+
+    class Meta():
+        unique_together = ('station', 'week_day')
 
     def __str__(self):
         return f'{self.get_week_day_display()}: {self.start_time} - {self.end_time}'
@@ -76,3 +82,15 @@ class StationPetrolMark(models.Model):
 
     def __str__(self):
         return f'{self.get_petrol_mark_display()}: {self.price}'
+    
+
+class StationRating(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    station = models.ForeignKey('stations.Station', on_delete=models.CASCADE)
+    rating = models.DecimalField(decimal_places=1, max_digits=2, default=0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+    review = models.CharField(max_length=255, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.rating)

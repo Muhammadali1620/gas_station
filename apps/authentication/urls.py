@@ -1,7 +1,7 @@
-# from django.urls import path
-# from . import views
+from django.urls import path
+from . import views
 
 
-# urlpatterns = [
-#     path('', views.ClassView.as_view(), name='url_name'),
-# ]
+urlpatterns = [
+    path('code/', views.SendAuthCodeAPIView.as_view(), name='sends_code'),
+]

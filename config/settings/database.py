@@ -4,7 +4,6 @@ from django.conf import settings
 
 POSTGRES = True
 
-print(os.environ['DB_NAME'], os.environ['SECRET_KEY'])
 
 if POSTGRES:
     DATABASES = {

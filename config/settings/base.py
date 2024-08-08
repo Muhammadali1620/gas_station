@@ -43,7 +43,7 @@ INSTALLED_APPS += [
     'apps.orders.apps.OrdersConfig',
     'apps.wishlist.apps.WishlistConfig',
     'apps.appeals.apps.AppealsConfig',
-    'apps.reviews.apps.ReviewsConfig',
+    'apps.complaints.apps.ComplaintsConfig',
     'apps.notifications.apps.NotificationsConfig',
 ]
 

@@ -1,28 +1,22 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 
 from apps.cars.validators import validate_car_number
-from django.contrib.postgres.fields import ArrayField
-
 from apps.stations.models import StationPetrolMark
 
 
+class CarModel(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True)
+    parent = models.ForeignKey('self', on_delete=models.PROTECT, null=True, blank=True)
+
+    def clean(self):
+        if not self.pk and self.parent.parent.parent:
+            raise ValidationError({'parent': 'Модель автомобиля не может быть родительской моделью'})
+
+
 class UserCar(models.Model):
-    class CarModel(models.IntegerChoices):
-        OTHER = 0, 'ДРУГАЯ'
-        NEXIA_1 = 1, 'NEXIA 1'
-        NEXIA_2 = 2, 'NEXIA 2'
-        NEXIA_3 = 4,'NEXIA 3'
-        MALIBU = 5, 'MALIBU'
-        GENTRA = 6, 'GENTRA'
-        TRAKER = 7, 'TRAKER'
-        MATIZ = 8, 'MATIZ'
-        SPARK = 9, 'SPARK'
-        EPICA = 10, 'EPICA'
-        LACETTI = 11, 'LACETTI'
-        TICO = 12, 'TICO'
-        CAPTIVA = 13, 'CAPTIVA'
-        COBALT = 14, 'COBALT'
-    
     class CarColor(models.IntegerChoices):
         OTHER = 0, 'ДРУГИЕ'
         BLACK = 1, 'ЧОРНЫЙ'
@@ -41,10 +35,14 @@ class UserCar(models.Model):
 
     user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE)
     number = models.CharField(max_length=10, validators=[validate_car_number], unique=True)
-    model = models.PositiveSmallIntegerField(choices=CarModel.choices, default=CarModel.OTHER)
+    model = models.ForeignKey(CarModel, on_delete=models.PROTECT)
     color = models.PositiveSmallIntegerField(choices=CarColor.choices, default=CarColor.OTHER, blank=True, null=True)
-    category = models.PositiveSmallIntegerField(choices=CarCategory.choices)
     petrol_mark = ArrayField(base_field=models.PositiveSmallIntegerField(choices=StationPetrolMark.PetrolMarks.choices, blank=True, null=True))
+
+    def clean(self):
+        if not self.model.parent.parent:
+            raise ValidationError({'model': 'Модель автомобиля не может быть родительской моделью'})
 
     def __str__(self):
         return self.number
+    
