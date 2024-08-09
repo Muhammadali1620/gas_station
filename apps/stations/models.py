@@ -6,19 +6,28 @@ from django.conf import settings
 
 class Station(models.Model):
     class Comforts(models.IntegerChoices):
-        WIFI = 1, 'WIFI'
-        SHOP = 2, 'SHOP'
-        GAME_CLUB = 3, 'GAME_CLUB'
-        FOOD = 4, 'FOOD'
+        WIFI = 1, 'Вай-фай'
+        SHOP = 2, 'Магазин'
+        GAME_CLUB = 3, 'Игровой клуб' 
+        CAFE = 4, 'Кафе'
+        MOSQUE = 5, 'Мечеть'
+        WC  = 6, 'Туалет'
+    
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='work_times')
 
     name = models.CharField(max_length=100)
-    short_text = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=100, unique=True)
+
     logo = models.ImageField(upload_to='stations/logos/%Y/%m/%d/', blank=True, null=True)
-    rating = models.FloatField(default=0.0)
+    video = models.FileField(upload_to='stations/videos/%Y/%m/%d/', blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=['mp4', 'mkv', 'webm', 'mpeg'])])
+    short_text = models.CharField(max_length=255, blank=True)
+    
+    rating = models.FloatField(default=0.0, editable=False)
+
     address = models.CharField(max_length=150)
     latitude = models.FloatField()
     longitude = models.FloatField()
-    video = models.FileField(upload_to='stations/videos/%Y/%m/%d/', blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4', 'mkv', 'webm', 'mpeg'])])
+
     comforts = ArrayField(base_field=models.PositiveSmallIntegerField(choices=Comforts.choices, blank=True, null=True))
 
     def __str__(self):
@@ -43,8 +52,6 @@ class StationWorkTime(models.Model):
         FRIDAY = 5, 'Пятница'
         SATURDAY = 6, 'Суббота'
         SUNDAY = 7, 'Воскресенье'
-
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='work_times')
 
     station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='work_times')
     week_day = models.PositiveSmallIntegerField(choices=WeekDays.choices)
@@ -82,6 +89,9 @@ class StationPetrolMark(models.Model):
 
     def __str__(self):
         return f'{self.get_petrol_mark_display()}: {self.price}'
+
+    class Meta:
+        unique_together = (('station', 'petrol_mark'),)
     
 
 class StationRating(models.Model):
@@ -94,3 +104,11 @@ class StationRating(models.Model):
 
     def __str__(self):
         return str(self.rating)
+    
+    class Meta:
+        unique_together = (('user', 'station'),)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.station.rating = StationRating.objects.filter(station=self.station).aggregate(avg_rating=models.Avg('rating'))['avg_rating']
+        self.station.save()

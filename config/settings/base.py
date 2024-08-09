@@ -19,6 +19,7 @@ CORS_ALLOW_ALL_ORIGINS: True
 
 INSTALLED_APPS = [
     'jazzmin',
+    'modeltranslation',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -28,9 +29,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'debug_toolbar',
     'corsheaders',
     'drf_yasg',
+    'colorfield',
 ]
 
 INSTALLED_APPS += [

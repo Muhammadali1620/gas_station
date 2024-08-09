@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 
+from colorfield.fields import ColorField
+
 from apps.cars.validators import validate_car_number
 from apps.stations.models import StationPetrolMark
 
@@ -34,9 +36,9 @@ class UserCar(models.Model):
         SUV = 8, 'Внедорожник'
 
     user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE)
-    number = models.CharField(max_length=10, validators=[validate_car_number], unique=True)
+    number = models.CharField(max_length=10, db_index=True, validators=[validate_car_number], unique=True)
     model = models.ForeignKey(CarModel, on_delete=models.PROTECT)
-    color = models.PositiveSmallIntegerField(choices=CarColor.choices, default=CarColor.OTHER, blank=True, null=True)
+    color = ColorField(default='#FF0000')
     petrol_mark = ArrayField(base_field=models.PositiveSmallIntegerField(choices=StationPetrolMark.PetrolMarks.choices, blank=True, null=True))
 
     def clean(self):

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
 from django.core.validators import MinValueValidator
+from django.conf import settings
 
 from apps.general.models import General
 from apps.stations.models import StationPetrolMark
@@ -13,10 +14,12 @@ class Bookings(models.Model):
     car_number = models.CharField(max_length=100)
     car_model = models.CharField(max_length=100)
 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
     petrol_mark = models.PositiveSmallIntegerField(choices=StationPetrolMark.PetrolMarks.choices)
-    quantity = models.PositiveSmallIntegerField()
+    quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
     booking_time = models.DateTimeField(validators=[MinValueValidator(now)])
-    minutes = models.PositiveSmallIntegerField()
+    minutes = models.PositiveSmallIntegerField(editable=False)
 
     def save(self, *args, **kwargs):
         if not self.car_number:

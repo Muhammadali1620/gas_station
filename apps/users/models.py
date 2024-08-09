@@ -26,8 +26,8 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=20, unique=True, validators=[phone_validate])
     email = models.EmailField(unique=True, blank=True, null=True)
     full_name = models.CharField(max_length=150, blank=True, null=True)
-    region = models.PositiveSmallIntegerField(choices=Regions.choices)
-    district = models.CharField(max_length=150)
+    region = models.PositiveSmallIntegerField(choices=Regions.choices, blank= True, null=True)
+    district = models.CharField(max_length=150, blank=True, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     USERNAME_FIELD = 'phone_number'

@@ -1,12 +1,14 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_delete
+from apps.general.services import delete_file_after_delete_obj
+from apps.stations.models import Station, StationImage
 
-from apps.stations.models import StationRating
-from django.db.models import Avg
+
+@receiver(post_delete, sender=Station)
+def delete_photo_on_delete_station(instance, *args, **kwargs):
+    delete_file_after_delete_obj(instance)
 
 
-@receiver(post_save, sender=StationRating)
-def update_station_rating(instance, created, *args, **kwargs):
-    if created:
-        instance.station.rating = StationRating.objects.filter(station=instance.station).aggregate(avg_rating=Avg('rating'))['avg_rating']
-        instance.station.save()
+@receiver(post_delete, sender=StationImage)
+def delete_photo_on_delete_station_image(instance, *args, **kwargs):
+    delete_file_after_delete_obj(instance)
