@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.cache import cache
 
 
 class General(models.Model):
@@ -7,4 +8,17 @@ class General(models.Model):
 
     @classmethod
     def get_min_payment_amount(cls):
-        return getattr(cls.objects.first(), 'min_payment_amount', 5000)
+        amount = cache.get('min_payment_amount', None)
+        if amount is None:
+            amount = getattr(cls.objects.first(), 'min_payment_amount', 5000)
+            cache.set('min_payment_amount', amount, 7 * 24 * 60 * 60)
+        return amount
+
+    @classmethod
+    def get_booking_price(cls):
+        amount = cache.get('booking_price', None)
+        if amount is None:
+            amount = getattr(cls.objects.first(), 'booking_price', 5000)
+            cache.set('booking_price', amount, 7 * 24 * 60 * 60)
+        return amount
+
