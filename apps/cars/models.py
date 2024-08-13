@@ -46,10 +46,6 @@ class UserCar(models.Model):
     color = ColorField(default='#FF0000')
     petrol_mark = ArrayField(base_field=models.PositiveSmallIntegerField(choices=StationPetrolMark.PetrolMarks.choices),blank=True, null=True)
 
-    def clean(self):
-        if not self.model.parent or not self.model.parent.parent:
-            raise ValidationError({'model': 'Модель автомобиля не может быть родительской моделью'})
-            
     def __str__(self):
         return self.number
     

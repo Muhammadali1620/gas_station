@@ -36,7 +36,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'phone_number'
 
     def clean(self):
-        if self.district.split('X')[0] != str(self.region):
+        if self.district and self.district.split('X')[0] != str(self.region):
             raise ValidationError('District and region do not match')
 
     def __str__(self):

@@ -65,6 +65,7 @@ MIDDLEWARE = [
     
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 
+    'apps.general.middleware.LanguageMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

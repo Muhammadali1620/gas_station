@@ -2,27 +2,26 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 
 from apps.cars.models import UserCar
 from apps.cars.serializers import UserCarSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
-class UserCarCreateListView(ListCreateAPIView):
+class UserCarCreateListAPIView(ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserCarSerializer
     
     def get_queryset(self):
-        return UserCar.objects.filter(user_id=self.request.user.pk)
+        return UserCar.objects.filter(user_id=self.request.user.id)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['user_id'] = self.request.user.id
-        return context
-    
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user.id)
+
 
 class UserCarRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserCarSerializer
 
     def get_queryset(self):
-        return UserCar.objects.filter(user_id=self.request.user.pk)
-    
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['user_id'] = self.request.user.id
-        return context
+        return UserCar.objects.filter(user_id=self.request.user.id)
+
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user.id)

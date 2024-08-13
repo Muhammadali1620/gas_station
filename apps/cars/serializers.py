@@ -10,19 +10,12 @@ class UserCarSerializer(serializers.ModelSerializer):
     model_name = serializers.CharField(source='model.name', read_only=True)
     class Meta:
         model = UserCar
-        fields = ['pk', 'user','user_phone_number', 'model_name', 'number', 'model', 'color', 'petrol_mark']
-        extra_kwargs = {
-            'user': {'required': False, 'write_only': True},
-            'model': {'write_only': True}
-        }
-    
-    def save(self, **kwargs):
-        user = get_user_model().objects.get(pk=self.context['user_id'])
-        kwargs['user'] = user
-        return super().save(**kwargs)
+        fields = ['pk','user_phone_number', 'model_name', 'number', 'model', 'color', 'petrol_mark']
     
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        model = UserCar(**attrs)
-        model.clean()
+        model = attrs['model']
+
+        if not model.parent or not model.parent.parent:
+            raise serializers.ValidationError({'model': 'Модель автомобиля не может быть родительской моделью'})
         return attrs

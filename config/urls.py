@@ -8,6 +8,9 @@ from .yasg import schema_view
 
 
 urlpatterns = [
+    #admin
+    path('admin/', admin.site.urls),
+
     #2rd apps
     path('__debug__/', include('debug_toolbar.urls')),
     path('setlang/<str:lang>/', set_language, name='set_language'),
@@ -17,17 +20,11 @@ urlpatterns = [
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
-]   
-
-#apps language
-urlpatterns += i18n_patterns(
-    #admin
-    path('admin/', admin.site.urls),
-
     #my apps
     path('api/v1/auth/', include('apps.authentication.urls')),
     path('api/v1/users/', include('apps.users.urls')),
     path('api/v1/cars/', include('apps.cars.urls')),
-)
+    path('api/v1/stations/', include('apps.stations.urls')),
+]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

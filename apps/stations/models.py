@@ -28,11 +28,11 @@ class Station(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
 
-    comforts = ArrayField(base_field=models.PositiveSmallIntegerField(choices=Comforts.choices, blank=True, null=True))
+    comforts = ArrayField(base_field=models.PositiveSmallIntegerField(choices=Comforts.choices), blank=True, null=True)
 
     def __str__(self):
         return self.name
-
+   
 
 class StationImage(models.Model):
     station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='images')

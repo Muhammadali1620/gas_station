@@ -1,14 +1,14 @@
 from django.conf import settings
 
 
-LANGUAGE_CODE = 'uz'
+LANGUAGE_CODE = 'ru'
 LANGUAGES = [
+    ('ru', 'Russian'),
     ('uz', 'Uzbek'),
     ('en', 'English'),
-    ('ru', 'Russian'),
 ]
-MODELTRNSLATION_DEFAULT_LANGUAGE = 'uz'
-MODELTRNSLATION_LANGUAGE = ('en', 'ru', 'uz')
+MODELTRNSLATION_DEFAULT_LANGUAGE = 'ru'
+MODELTRNSLATION_LANGUAGE = ('ru', 'en', 'uz')
 
 USE_I18N = True
 
