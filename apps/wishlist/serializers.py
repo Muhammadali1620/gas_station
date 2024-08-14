@@ -1,8 +1,12 @@
-# from rest_framework import serializers
-# from apps.app_name.models import ModelName
+from rest_framework import serializers
+
+from apps.stations.serializers import StationListSerializer
+from apps.wishlist.models import Wishlist
 
 
-# class ModelNameForm(serializers.ModelSerializer):
-#     class Meta:
-#         model = ModelName
-#         fields = '__all__'
+class WishlistSerializer(serializers.ModelSerializer):
+    station = StationListSerializer(read_only=True)
+
+    class Meta:
+        model = Wishlist
+        fields = '__all__'

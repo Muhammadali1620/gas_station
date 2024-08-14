@@ -1,7 +1,8 @@
-# from django.urls import path
-# from . import views
+from django.urls import path
+from . import views
 
 
-# urlpatterns = [
-#     path('', views.ClassView.as_view(), name='url_name'),
-# ]
+urlpatterns = [
+    path('', views.WishlistListAPIView.as_view(), name='wishlist'),
+    path('<int:pk>/', views.WishlistCreateOrDelateAPIView.as_view(), name='create_or_delate_wishlist'),
+]
