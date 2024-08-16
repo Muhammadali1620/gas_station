@@ -28,7 +28,7 @@ class Station(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
 
-    comforts = ArrayField(base_field=models.PositiveSmallIntegerField(choices=Comforts.choices), blank=True, null=True)
+    comforts = ArrayField(base_field=models.PositiveSmallIntegerField(choices=Comforts.choices), blank=True)
 
     def __str__(self):
         return self.name
@@ -84,8 +84,10 @@ class StationPetrolMark(models.Model):
     station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='petrol_marks')
     petrol_mark = models.PositiveSmallIntegerField(choices=PetrolMarks.choices)
     number_of_columns = models.PositiveSmallIntegerField(default=1, validators=[MinValueValidator(1)])
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0, validators=[MinValueValidator(0)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     is_active = models.BooleanField(default=True)
+    fueling_time = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), ], help_text='in seconds')
+
 
     def __str__(self):
         return f'{self.get_petrol_mark_display()}: {self.price}'

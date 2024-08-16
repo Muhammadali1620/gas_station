@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/v1/cars/', include('apps.cars.urls')),
     path('api/v1/stations/', include('apps.stations.urls')),
     path('api/v1/wishlist/', include('apps.wishlist.urls')),
+    path('api/v1/bookings/', include('apps.booking.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -127,11 +127,11 @@ class SendChangePasswordCodeSerializer(serializers.Serializer):
         attrs = super().validate(attrs)
         phone_number = attrs['phone_number']
 
-        #self.check_limit()
+        self.check_limit()
 
         attrs['code'] = SendAuthCodeSerializer.generate_code()
         SendAuthCodeSerializer.send_code(phone_number, attrs['code'])
-        cache.set(f'{phone_number}_change_password_code', attrs['code'], 10 * 60)    
+        cache.set(f'{phone_number}_change_password_code', attrs['code'], 10 * 60)
 
         return attrs
 
