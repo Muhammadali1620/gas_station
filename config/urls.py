@@ -11,12 +11,14 @@ urlpatterns = [
     #admin
     path('admin/', admin.site.urls),
 
-    #2rd apps
+    #debug toolbar
     path('__debug__/', include('debug_toolbar.urls')),
     path('setlang/<str:lang>/', set_language, name='set_language'),
     
+    #rest auth
     path('rest_api', include('rest_framework.urls')),
 
+    #swagger
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
@@ -27,6 +29,7 @@ urlpatterns = [
     path('api/v1/stations/', include('apps.stations.urls')),
     path('api/v1/wishlist/', include('apps.wishlist.urls')),
     path('api/v1/bookings/', include('apps.booking.urls')),
+    path('api/v1/complaints/', include('apps.complaints.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

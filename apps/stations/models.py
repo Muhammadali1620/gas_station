@@ -19,7 +19,9 @@ class Station(models.Model):
     slug = models.SlugField(max_length=100, unique=True)
 
     logo = models.ImageField(upload_to='stations/logos/%Y/%m/%d/', blank=True, null=True)
-    video = models.FileField(upload_to='stations/videos/%Y/%m/%d/', blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=['mp4', 'mkv', 'webm', 'mpeg'])])
+    video = models.FileField(upload_to='stations/videos/%Y/%m/%d/', 
+                             blank=True, null=True, 
+                             validators=[FileExtensionValidator(allowed_extensions=['mp4', 'mkv', 'webm', 'mpeg'])])
     short_text = models.CharField(max_length=255, blank=True)
     
     rating = models.FloatField(default=0.0, editable=False)
@@ -112,5 +114,6 @@ class StationRating(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.station.rating = StationRating.objects.filter(station=self.station).aggregate(avg_rating=models.Avg('rating'))['avg_rating']
+        self.station.rating = StationRating.objects.filter(station_id=self.station.id
+                                                           ).aggregate(avg_rating=models.Avg('rating'))['avg_rating']
         self.station.save()
