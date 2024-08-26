@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+
+  gas_station:
+    build: .
+    container_name: gas_station
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - .env
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+    volumes:
+      - ".:/app"
+    depends_on:
+      - gas_station_postgres
+
+  gas_station_postgres:
+    image: postgres:15.8
+    container_name: gas_station_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=gas_station_db
+      - POSTGRES_USER=admin_gas_station
+      - POSTGRES_PASSWORD=test_db_gas_station
+    
+  gas_station_redis:
+    image: redis:7.0.15
+    container_name: gas_station_redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
